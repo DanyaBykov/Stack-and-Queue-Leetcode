@@ -3,24 +3,24 @@ from collections import deque
 class FreqStack:
 
     def __init__(self):
+        self.freq = {}
+        self.deq = {}
         self.stack1 = deque()
 
     def push(self, val: int) -> None:
         self.stack1.append(val)
+        self.freq[val] = self.freq.get(val, 0) + 1
+        if self.freq[val] in self.deq:
+            self.deq[self.freq[val]].append(val)
+        else:
+            self.deq[self.freq[val]] = deque([val])
 
     def pop(self) -> int:
-        max_val = None
-        max_freq = 0
-        self.stack1.reverse()
-        for val in self.stack1:
-            freq = self.stack1.count(val)
-            if freq > max_freq:
-                max_freq = freq
-                max_val = val
-            if freq == max_freq:
-                if self.stack1.index(val) < self.stack1.index(max_val):
-                    max_val = val
-                    max_freq = freq
-        self.stack1.remove(max_val)
-        self.stack1.reverse()
-        return max_val
+        max_freq = max(self.freq.values())
+        val = self.deq[max_freq].pop()
+        if not self.deq[max_freq]:
+            del self.deq[max_freq]
+        self.freq[val] -= 1
+        if not self.freq[val]:
+            del self.freq[val]
+        return val
